@@ -10,4 +10,5 @@
 
 > npm run dev
 
-_Nota: Ejecutar primero el back-end y el front-end_
+_Nota: Ejecutar primero el back-end y luego el front-end_
+_Recuerde cambiar la cadena de conexion de oracle en la ruta: back-end/.env_
