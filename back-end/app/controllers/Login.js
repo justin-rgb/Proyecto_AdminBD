@@ -3,20 +3,21 @@ const oracledb = require('oracledb');
 
 const login = async (req, res) => {
 
-    const { email, contrasena } = req.body;
+    const { USUARIO, CONTRASENA } = req.body;
 
-    if (!email || !contrasena ) {
+    if (!USUARIO || !CONTRASENA ) {
         return res.status(400).json({ error: 'Complete todos los campos' });
     }
 
     let connection;
 
     try {
+
         connection = await oracledb.getConnection(dbConfig);
 
         const result = await connection.execute(
-            `SELECT DISTINCT * FROM cliente WHERE email = :email AND contrasena = :contrasena`,
-            [email, contrasena]
+            `SELECT * FROM usuarios WHERE USUARIO = :usuario AND CONTRASENA = :contrasena`,
+            [USUARIO.toString(), Number(CONTRASENA)]
         );
 
         if (result.rows.length === 0) {

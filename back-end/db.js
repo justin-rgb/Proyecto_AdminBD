@@ -1,7 +1,8 @@
 const oracledb = require('oracledb');
+const dbConfig = require('./dbConfig');
 
 async function initialize() {
-    await oracledb.createPool();
+    await oracledb.createPool(dbConfig);
 }
 
 async function close() {
