@@ -84,16 +84,9 @@ const registrarCliente = async (req, res) => {
 }
 
 
-const registrarReserv = async (req, res) => {
 
-    //INSERT INTO Vuelo (IDVuelo, IDAvion, ID_Destino, Fecha_salida, Fecha_llegada, Precio)
-    //VALUES ('V001', 'A001', 'D001', TO_TIMESTAMP('10-ABR-24 09:00:00', 'DD-MON-YY HH24:MI:SS'), TO_TIMESTAMP('10-ABR-24 15:00:00', 'DD-MON-YY HH24:MI:SS'), 500)
-
-
-}
 
 
 module.exports = {
-    registrarCliente,
-    registrarReserv
+    registrarCliente
 }

@@ -26,6 +26,7 @@ const Register = () => {
         justifyContent: 'center', 
         alignItems: 'center', 
         flexDirection: 'column',
+        paddingTop: '50px'
       // paddingBottom: '%'
       }}
     > 
@@ -35,7 +36,7 @@ const Register = () => {
           <RegistrarCliente />
         </div>
 
-        <div className='col'>
+        <div className='col' style={{ width: '100%'}}>
           <h2>Registrar Reservación</h2>
           <RegistrarReserv />
         </div>

@@ -1,19 +1,46 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import axios from 'axios'
 import { useState } from 'react';
+import moment from 'moment'
 
 const RegistrarReserv = () => {
 
+    const [idCliente, setIdCliente] = useState('')
+    const [email, setEmail] = useState('')
+    const [vuelos, setVuelos] = useState([])
     const [formData, setFormData] = useState({
-        nombre: '',
-        apellido: '',
-        sexo: '',
-        fechanacimiento: '',
-        estadocivil: '',
-        email: '',
-        telefono: '',
-        idciudad: ''
+        idvuelo: ''
     });
 
+    const obtenerIdCliente = () => {
+        axios.post('http://localhost:3000/obtenerCliente', {
+            "email": email
+        })
+        .then( resp => {
+            console.log(resp.data.cliente);
+            setIdCliente(resp.data.cliente[0])
+            return;
+        })
+        .catch( err => {
+            setIdCliente('')
+            console.log(err);
+            return;
+        })
+    }
+
+    // OBTENER VUELOS
+    useEffect( () => {
+        axios.get('http://localhost:3000/obtenerVuelos')
+        .then( (resp) => {
+            setVuelos(resp.data.vuelos)
+        })
+        .catch( (error) => {
+            console.error(error)
+        })
+    },[])
+    // 
+    // 
+    // 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -25,109 +52,58 @@ const RegistrarReserv = () => {
 
 
         const data = {
-            'nombre': formData.nombre.toString(),
-            'apellido': formData.apellido.toString(),
-            'sexo': formData.sexo.toString(),
-            'fechanacimiento': moment(formData.fechanacimiento).format('DD-MM-YYYY'),
-            'estadocivil': formData.estadocivil.toString(),
-            'email': formData.email.toString(),
-            'telefono': Number(formData.telefono),
-            'idciudad': formData.idciudad.toString(),
+            'id_cliente': idCliente,
+            'idvuelo': formData.idvuelo,
+            'fechareserva': moment().format('DD-MM-YYYY'),
+            'estadoreserva': 'Reservado'
         }
 
         console.log(data);
 
         //Enviar al endpoint del api
-        fetch('http://localhost:3000/registrarReservacion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then( response => {
-            if (response.ok) {
-                // Si es exitosa, convertir la respuesta a JSON
-                return response.json();
-            }
-            alert('Verifique todos los campos nuevamente')
-            throw new Error('Verifique todos los campos nuevamente')
-        })
-        .then( async (resp) => {
-            alert('Se ha registrado el usuario correctamente')
+        axios.post('http://localhost:3000/registrarReserva', data)
+        .then( resp => {
+            alert("Se ha registrado la reserva correctamente")
             return;
         })
-        .catch( error => {
-            console.error(error)
+        .catch( err => {
+            alert("Ha ocurrido un error al registrar la reserva")
+            console.log(err);
+            return;
         })
-
 
     };
 
     return (
         <div style={{ marginBottom: '40px' }}>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label className="form-label">Nombre:</label>
-                    <input className="form-control" type="text" name="nombre" value={formData.nombre} onChange={handleChange} />
-                </div>
-                <div>
-                    <label className="form-label">Apellido:</label>
-                    <input className="form-control" type="text" name="apellido" value={formData.apellido} onChange={handleChange} />
-                </div>
-                <div>
-                    <label className="form-label">Email:</label>
-                    <input className="form-control" type="email" name="email" value={formData.email} onChange={handleChange} />
-                </div>
-                <div>
-                    <label className="form-label">Fecha de Nacimiento:</label>
-                    <input className="form-control" type="date" name="fechanacimiento" value={formData.fechanacimiento} onChange={handleChange} />
-                </div>
-                <div>
-                    <label className="form-label">Sexo:</label>
-                    <select className="form-select" name="sexo" value={formData.sexo} onChange={handleChange}>
-                        <option value="">Seleccionar</option>
-                        <option value="Masculino">Masculino</option>
-                        <option value="Femenino">Femenino</option>
-                    </select>
-                </div>
-                <div>
-                    <label className="form-label">Estado Civil:</label>
-                    <select className="form-select" name="estadocivil" value={formData.estadocivil} onChange={handleChange}>
-                        <option value="">Seleccionar</option>
-                        <option value="Soltero">Soltero/a</option>
-                        <option value="Casado">Casado/a</option>
-                        <option value="Divorciado">Divorciado/a</option>
-                        <option value="Viudo">Viudo/a</option>
-                    </select>
+                <div className='mb-3'>
+                    <label className="form-label">Correo electrónico del cliente:</label>
+                    <input className="form-control mb-2" type="email" name="email" value={email} onChange={ e => setEmail(e.target.value)} />
+                    <button className='btn bg-info' type='button' onClick={obtenerIdCliente}>Buscar ID</button>
                 </div>
 
-                <div>
-                    <label className="form-label">Ciudad:</label>
-                    <select className="form-select" name="idciudad" value={formData.idciudad} onChange={handleChange}>
+                <div className='mb-3'>
+                    <label className="form-label">ID Cliente:</label>
+                    <input disabled className="form-control" type="text" name="nombre" required value={idCliente} onChange={ e => setIdCliente(e.target.value)} />
+                </div>
+
+
+                <label className="form-label h6">Seleccione el vuelo de preferencia:</label>
+                <select className="form-select" name="idvuelo" value={formData.idvuelo} onChange={handleChange}>
                     <option value="">Selecciona una ciudad</option>
-                        <option value="D001">San Jose</option>
-                        <option value="D002">California</option>
-                        <option value="D003">Seattle</option>
-                        <option value="D004">Mexico</option>
-                        <option value="D005">New York</option>
-                        <option value="D006">Tokyo</option>
-                        <option value="D007">Delhi</option>
-                        <option value="D008">Pekin</option>
-                        <option value="D009">Dhaka</option>
-                        <option value="D010">El Cairo</option>
-                        <option value="D011">Sao Paulo</option>
-                        <option value="D012">Shangai</option>
-                        <option value="D013">Washington</option>
-                        <option value="D014">Texas</option>
-                        <option value="D015">Cartago</option>
-                    </select>
-                </div>
+                {
+                    vuelos ? vuelos.map( vuelo => {
+                        vuelo[1] = vuelo[1].toString().slice(0,16)
+                       return(
+                        <option value={vuelo[0]} > {vuelo[1]} / {vuelo[2]} / {vuelo[3]} / Costo: ${vuelo[4]} </option>
+                       )
+                    })
+                    :
+                    <p>No hay vuelos</p>
+                }
 
-                <div>
-                    <label className="form-label">Teléfono:</label>
-                    <input className="form-control" type="tel" name="telefono" value={formData.telefono} onChange={handleChange} />
-                </div>
+                </select>
 
                 <button type="submit" className='btn btn-success mt-3'>Registrar Reservación</button>
             </form>
