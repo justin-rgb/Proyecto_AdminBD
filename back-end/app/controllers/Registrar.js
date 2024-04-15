@@ -5,22 +5,25 @@ const { v4: uuidv4 } = require('uuid');
 const registrarCliente = async (req, res) => {
 
     const guid = uuidv4().substring(0,10).toUpperCase();
+    const guidIdDom = uuidv4().substring(0,10).toUpperCase();
 
     const { idciudad, 
-            id_domicilio, 
             nombre, 
             apellido, 
             sexo = 'Otro', 
             fechanacimiento, 
             estadocivil, 
             email, 
-            telefono
+            telefono,
+            direccion,
+            ciudad,
+            codigopostal
     } = req.body;
 
     const data = {
         id_cliente: guid,
+        id_domicilio: guidIdDom,
         idciudad,
-        id_domicilio,
         nombre,
         apellido,
         sexo,
@@ -30,7 +33,14 @@ const registrarCliente = async (req, res) => {
         telefono
     }
 
-    if (!idciudad || !id_domicilio || !nombre || !apellido || !fechanacimiento || !estadocivil || !email || !telefono) {
+    const dataDomicilio = {
+        id_domicilio : guidIdDom,
+        direccion,
+        ciudad,
+        codigopostal
+    }
+
+    if (!idciudad || !nombre || !apellido || !fechanacimiento || !estadocivil || !email || !telefono || !direccion || !ciudad || !codigopostal ) {
         return res.status(400).json({ error: 'Se requieren todos los campos para registrar un usuario' });
     }
 
@@ -39,19 +49,23 @@ const registrarCliente = async (req, res) => {
     console.log(data);
 
     try {
-        // Establecer conexión a la base de datos
         connection = await oracledb.getConnection(dbConfig);
 
-        //INTO Cliente (ID_Cliente, IDCiudad, ID_Domicilio, Nombre, Apellido, Sexo, FechaNacimiento, EstadoCivil, Email, Telefono)
-        //VALUES ('CLI001', 'D001', 'DOM001', 'John', 'Doe', 'Masculino', TO_DATE('1990-01-15', 'YYYY-MM-DD'), 'Soltero', 'john.doe@example.com', 123456789
+        await connection.execute(
+            `INSERT INTO Domicilio (ID_Domicilio, Direccion, Ciudad, CodigoPostal)
+            VALUES (:id_domicilio, :direccion, :ciudad, :codigopostal)`,
+            [dataDomicilio.id_domicilio, dataDomicilio.direccion, dataDomicilio.ciudad, dataDomicilio.codigopostal],
+            { autoCommit: true } // Realizar commit automáticamente
+        );
 
-        // Ejecutar la consulta para insertar el nuevo usuario
-         await connection.execute(
+        await connection.execute(
             `INSERT INTO Cliente (ID_Cliente, IDCiudad, ID_Domicilio, Nombre, Apellido, Sexo, FechaNacimiento, EstadoCivil, Email, Telefono)
             VALUES (:id_cliente, :idciudad, :id_domicilio, :nombre, :apellido, :sexo, :fechanacimiento, :estadocivil, :email, :telefono)`,
             [data.id_cliente, data.idciudad, data.id_domicilio, data.nombre, data.apellido, data.sexo, data.fechanacimiento, data.estadocivil, data.email, data.telefono],
             { autoCommit: true } // Realizar commit automáticamente
         );
+
+
 
         res.status(201).json({ message: 'Usuario registrado exitosamente' });
     } catch (error) {

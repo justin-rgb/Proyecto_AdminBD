@@ -58,28 +58,37 @@ const Login = () => {
     };
 
     return (
-        <div>
-            <h2>Iniciar Sesión</h2>
+        <div className="bg-info-subtle" style={{ width: '100%', 
+            height: '100vh', 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            flexDirection: 'column',
+            paddingBottom: '10%'
+        }}>
+            <h2>VuelosCR <hr/> <h3>Iniciar Sesión</h3></h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="username">Nombre de usuario:</label>
+                    <label htmlFor="username" className="form-label">Nombre de usuario:</label>
                     <input
+                        className="form-control"
                         type="text"
                         id="username"
                         value={username}
                         onChange={handleUsernameChange}
                     />
                 </div>
-                <div>
-                    <label htmlFor="password">Contraseña:</label>
+                <div className="mb-3">
+                    <label htmlFor="password" className="form-label">Contraseña:</label>
                     <input
+                        className="form-control"
                         type="password"
                         id="password"
                         value={password}
                         onChange={handlePasswordChange}
                     />
                 </div>
-                <button type="submit">Iniciar Sesión</button>
+                <button type="submit" className="btn btn-success">Iniciar Sesión</button>
             </form>
         </div>
     );
