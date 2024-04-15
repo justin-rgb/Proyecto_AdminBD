@@ -16,18 +16,44 @@ const Login = () => {
     };
 
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
+        const data = {
+            'USUARIO': username.toString() || '',
+            'CONTRASENA': password.toString() || ''
+        }
+
         //Enviar al endpoint del api
+        fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then( response => {
+            if (response.ok) {
+                // Si es exitosa, convertir la respuesta a JSON
+                return response.json();
+            }
+            alert('Usuario no encontrado / No puede iniciar sesion')
+            throw new Error('Usuario no encontrado')
+        })
+        .then( async (resp) => {
 
+            localStorage.removeItem('ID')
+            localStorage.removeItem('Usuario')
+            localStorage.setItem('ID', resp.user[0])
+            localStorage.setItem('Usuario', resp.user[1])
 
-
-        //En caso de respuesta positiva
-        //window.location = '/registrar'
-
-        console.log("Username:", username);
-        console.log("Password:", password);
+            alert('Ha iniciado sesión correctamente')
+            window.location = '/registrar'
+            return;
+        })
+        .catch( error => {
+            console.error(error)
+        })
 
     };
 
